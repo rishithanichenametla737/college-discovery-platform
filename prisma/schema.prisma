@@ -1,39 +1,39 @@
 generator client {
-  provider = "prisma-client-js"
+provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+provider = "postgresql"
+url = env("DATABASE_URL")
 }
 
 model College {
-  id          Int      @id @default(autoincrement())
-  name        String
-  location    String
-  course      String
-  fees        Int
-  rating      Float
-  placement   Int
-  hostel      String
-  type        String
-  exams       String
-  recruiters  String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+id Int @id @default(autoincrement())
+name String
+location String
+course String
+fees Int
+rating Float
+placement Int
+hostel String
+type String
+exams String
+recruiters String
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
 
-  reviews     Review[]
+reviews Review[]
 }
 
 model Review {
-  id          Int      @id @default(autoincrement())
+id Int @id @default(autoincrement())
+studentName String @default("Anonymous")
+rating Int
+comment String
 
-  studentName String   @default("Anonymous")
-  rating      Int
-  comment     String
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
-
-  collegeId   Int
-  college     College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+collegeId Int
+college College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
 }

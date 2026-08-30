@@ -1,14 +1,5 @@
 import { NextResponse } from "next/server";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@prisma/client";
-
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL!,
-});
-
-const prisma = new PrismaClient({
-  adapter,
-});
+import { prisma } from "@/lib/prisma";
 
 // ================= GET COLLEGES =================
 
@@ -28,8 +19,6 @@ export async function GET() {
       { error: "Failed to fetch colleges" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -149,7 +138,5 @@ export async function POST(request: Request) {
       { error: "Failed to add college" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
