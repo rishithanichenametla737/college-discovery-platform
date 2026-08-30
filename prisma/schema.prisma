@@ -20,4 +20,20 @@ model College {
   recruiters  String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  reviews     Review[]
+}
+
+model Review {
+  id          Int      @id @default(autoincrement())
+
+  studentName String   @default("Anonymous")
+  rating      Int
+  comment     String
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  collegeId   Int
+  college     College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
 }

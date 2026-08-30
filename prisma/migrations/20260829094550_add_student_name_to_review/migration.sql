@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Review" ADD COLUMN     "studentName" TEXT NOT NULL DEFAULT 'Anonymous',
+ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
