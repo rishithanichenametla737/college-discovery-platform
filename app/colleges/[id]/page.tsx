@@ -37,22 +37,19 @@ export default function CollegeDetails() {
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
-  // ================= ADD REVIEW =================
-
+  // ADD REVIEW
   const [studentName, setStudentName] = useState("");
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewText, setReviewText] = useState("");
 
-  // ================= EDIT REVIEW =================
-
+  // EDIT REVIEW
   const [editingReviewId, setEditingReviewId] =
     useState<number | null>(null);
 
   const [editRating, setEditRating] = useState(5);
   const [editText, setEditText] = useState("");
-
-  const [updating, setUpdating] = useState(false);
 
   // ================= LOAD COLLEGE =================
 
@@ -88,9 +85,7 @@ export default function CollegeDetails() {
 
     const loadReviews = async () => {
       try {
-        const response = await fetch(
-          `/api/colleges/${id}/reviews`
-        );
+        const response = await fetch(`/api/colleges/${id}/reviews`);
 
         if (!response.ok) return;
 
@@ -120,22 +115,17 @@ export default function CollegeDetails() {
     try {
       setSubmitting(true);
 
-      const response = await fetch(
-        `/api/colleges/${id}/reviews`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          body: JSON.stringify({
-            studentName: studentName.trim(),
-            rating: reviewRating,
-            comment: reviewText.trim(),
-          }),
-        }
-      );
+      const response = await fetch(`/api/colleges/${id}/reviews`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          studentName: studentName.trim(),
+          rating: reviewRating,
+          comment: reviewText.trim(),
+        }),
+      });
 
       const data = await response.json();
 
@@ -144,10 +134,7 @@ export default function CollegeDetails() {
         return;
       }
 
-      setReviews((currentReviews) => [
-        data,
-        ...currentReviews,
-      ]);
+      setReviews((currentReviews) => [data, ...currentReviews]);
 
       setStudentName("");
       setReviewText("");
@@ -162,7 +149,7 @@ export default function CollegeDetails() {
     }
   };
 
-  // ================= START EDIT REVIEW =================
+  // ================= START EDIT =================
 
   const startEditReview = (review: Review) => {
     setEditingReviewId(review.id);
@@ -193,11 +180,9 @@ export default function CollegeDetails() {
         `/api/colleges/${id}/reviews/${reviewId}`,
         {
           method: "PUT",
-
           headers: {
             "Content-Type": "application/json",
           },
-
           body: JSON.stringify({
             rating: editRating,
             comment: editText.trim(),
@@ -256,9 +241,7 @@ export default function CollegeDetails() {
       }
 
       setReviews((currentReviews) =>
-        currentReviews.filter(
-          (review) => review.id !== reviewId
-        )
+        currentReviews.filter((review) => review.id !== reviewId)
       );
 
       alert("Review deleted successfully! 🗑️");
@@ -272,11 +255,13 @@ export default function CollegeDetails() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-blue-50">
+      <main className="flex min-h-screen items-center justify-center bg-[#071426] text-white">
         <div className="text-center">
-          <div className="text-5xl">🎓</div>
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-blue-400/20 bg-[#0d1d33] text-3xl shadow-[0_0_40px_rgba(59,130,246,0.12)]">
+            🎓
+          </div>
 
-          <p className="mt-4 text-lg font-semibold text-gray-700">
+          <p className="mt-5 text-sm text-blue-100/60">
             Loading college details...
           </p>
         </div>
@@ -284,25 +269,26 @@ export default function CollegeDetails() {
     );
   }
 
-  // ================= INVALID COLLEGE =================
+  // ================= NOT FOUND =================
 
   if (!college) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-gray-50 px-6">
-        <div className="rounded-2xl bg-white p-10 text-center shadow-lg">
+      <main className="flex min-h-screen items-center justify-center bg-[#071426] px-6 text-white">
+        <div className="w-full max-w-md rounded-3xl border border-blue-400/10 bg-[#0d1d33] p-10 text-center shadow-[0_20px_80px_rgba(0,0,0,0.3)]">
           <div className="text-5xl">😕</div>
 
-          <h1 className="mt-4 text-2xl font-bold text-gray-900">
+          <h1 className="mt-5 text-2xl font-semibold">
             College Not Found
           </h1>
 
-          <p className="mt-2 text-gray-600">
-            The college you are looking for does not exist.
+          <p className="mt-3 text-sm leading-6 text-blue-100/50">
+            The college you are looking for does not exist or
+            may have been removed.
           </p>
 
           <button
             onClick={() => router.push("/")}
-            className="mt-6 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
+            className="mt-7 rounded-xl bg-blue-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-400"
           >
             ← Back to Colleges
           </button>
@@ -311,7 +297,7 @@ export default function CollegeDetails() {
     );
   }
 
-  // ================= AVERAGE REVIEW RATING =================
+  // ================= CALCULATIONS =================
 
   const averageReviewRating =
     reviews.length === 0
@@ -328,687 +314,703 @@ export default function CollegeDetails() {
   }).format(college.fees);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <main className="min-h-screen bg-[#071426] text-white">
 
-      {/* ================= NAVIGATION ================= */}
+      {/* BLUE BACKGROUND GLOW */}
 
-      <nav className="sticky top-0 z-50 flex items-center justify-between bg-white px-8 py-5 shadow-sm">
+      <div className="pointer-events-none fixed inset-0 -z-0 overflow-hidden">
+        <div className="absolute left-[-180px] top-[-180px] h-[420px] w-[420px] rounded-full bg-blue-500/10 blur-[120px]" />
+        <div className="absolute right-[-180px] top-[280px] h-[400px] w-[400px] rounded-full bg-cyan-400/5 blur-[120px]" />
+      </div>
 
-        <button
-          onClick={() => router.push("/")}
-          className="text-2xl font-bold text-blue-700"
-        >
-          CollegeFinder
-        </button>
+      {/* ================= NAVBAR ================= */}
 
-        <div className="flex gap-6 text-gray-700">
+      <nav className="sticky top-0 z-50 border-b border-blue-200/10 bg-[#071426]/90 px-5 py-4 backdrop-blur-xl md:px-8">
+
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
 
           <button
             onClick={() => router.push("/")}
-            className="hover:text-blue-600"
+            className="text-lg font-semibold tracking-tight text-white"
           >
-            Home
+            College<span className="text-blue-300">Finder</span>
           </button>
 
-          <button
-            onClick={() => router.push("/#colleges")}
-            className="hover:text-blue-600"
-          >
-            Colleges
-          </button>
+          <div className="hidden items-center gap-7 text-sm text-blue-100/55 md:flex">
+
+            <button
+              onClick={() => router.push("/")}
+              className="transition hover:text-white"
+            >
+              Home
+            </button>
+
+            <button
+              onClick={() => router.push("/#colleges")}
+              className="transition hover:text-white"
+            >
+              Colleges
+            </button>
+
+            <button
+              onClick={() => router.push("/#comparison")}
+              className="transition hover:text-white"
+            >
+              Compare
+            </button>
+
+            <button
+              onClick={() => router.push("/#favorites")}
+              className="transition hover:text-white"
+            >
+              Favorites
+            </button>
+
+          </div>
 
           <button
-            onClick={() => router.push("/#comparison")}
-            className="hover:text-blue-600"
+            onClick={() => router.back()}
+            className="rounded-xl border border-blue-200/10 bg-[#0d1d33] px-4 py-2 text-xs font-medium text-blue-100/70 transition hover:border-blue-400/30 hover:bg-[#142b49] hover:text-white"
           >
-            Compare
-          </button>
-
-          <button
-            onClick={() => router.push("/#favorites")}
-            className="hover:text-red-500"
-          >
-            ❤️ Favorites
+            ← Back
           </button>
 
         </div>
 
       </nav>
 
-      {/* ================= BACK BUTTON ================= */}
+      {/* ================= PAGE ================= */}
 
-      <div className="mx-auto max-w-6xl px-6 pt-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-8">
 
-        <button
-          onClick={() => router.back()}
-          className="rounded-xl bg-white px-5 py-3 font-medium text-gray-700 shadow-sm hover:bg-gray-100"
-        >
-          ← Back
-        </button>
+        {/* ================= HERO ================= */}
 
-      </div>
+        <section className="border-b border-blue-200/10 py-12 md:py-16">
 
-      {/* ================= COLLEGE HEADER ================= */}
+          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
 
-      <section className="mx-auto max-w-6xl px-6 py-10">
+            <div>
 
-        <div className="rounded-3xl bg-white p-8 shadow-lg">
+              <div className="mb-5 flex flex-wrap items-center gap-2">
 
-          <div className="flex flex-col gap-6 md:flex-row md:items-center">
+                <span className="rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-200">
+                  College Details
+                </span>
 
-            <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-blue-100 text-5xl">
-              🎓
-            </div>
-
-            <div className="flex-1">
-
-              <p className="font-semibold uppercase tracking-wider text-blue-600">
-                College Details
-              </p>
-
-              <h1 className="mt-2 text-4xl font-bold text-gray-900">
-                {college.name}
-              </h1>
-
-              <p className="mt-3 text-lg text-gray-600">
-                📍 {college.location}
-              </p>
-
-            </div>
-
-            <div className="rounded-2xl bg-yellow-50 px-6 py-5 text-center">
-
-              <p className="text-sm text-gray-500">
-                Rating
-              </p>
-
-              <p className="mt-1 text-2xl font-bold text-gray-900">
-                ⭐ {college.rating} / 5
-              </p>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* ================= OVERVIEW ================= */}
-
-      <section className="mx-auto max-w-6xl px-6 pb-10">
-
-        <h2 className="mb-6 text-3xl font-bold text-gray-900">
-          College Overview
-        </h2>
-
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-
-          <div className="rounded-2xl bg-white p-6 shadow-md">
-            <div className="text-3xl">📚</div>
-            <p className="mt-4 text-sm text-gray-500">Course</p>
-            <p className="mt-1 font-bold text-gray-900">
-              {college.course}
-            </p>
-          </div>
-
-          <div className="rounded-2xl bg-white p-6 shadow-md">
-            <div className="text-3xl">💰</div>
-            <p className="mt-4 text-sm text-gray-500">
-              Annual Fees
-            </p>
-            <p className="mt-1 font-bold text-gray-900">
-              {formattedFees} / year
-            </p>
-          </div>
-
-          <div className="rounded-2xl bg-white p-6 shadow-md">
-            <div className="text-3xl">🏫</div>
-            <p className="mt-4 text-sm text-gray-500">
-              College Type
-            </p>
-            <p className="mt-1 font-bold text-gray-900">
-              {college.type}
-            </p>
-          </div>
-
-          <div className="rounded-2xl bg-white p-6 shadow-md">
-            <div className="text-3xl">📊</div>
-            <p className="mt-4 text-sm text-gray-500">
-              Placement
-            </p>
-            <p className="mt-1 font-bold text-green-600">
-              {college.placement}%
-            </p>
-          </div>
-
-          <div className="rounded-2xl bg-white p-6 shadow-md">
-            <div className="text-3xl">🏠</div>
-            <p className="mt-4 text-sm text-gray-500">
-              Hostel
-            </p>
-            <p className="mt-1 font-bold text-green-600">
-              {college.hostel}
-            </p>
-          </div>
-
-          <div className="rounded-2xl bg-white p-6 shadow-md">
-            <div className="text-3xl">📍</div>
-            <p className="mt-4 text-sm text-gray-500">
-              Location
-            </p>
-            <p className="mt-1 font-bold text-gray-900">
-              {college.location}
-            </p>
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* ================= ADMISSION ================= */}
-
-      <section className="mx-auto max-w-6xl px-6 pb-10">
-
-        <div className="grid gap-6 md:grid-cols-2">
-
-          <div className="rounded-3xl bg-white p-7 shadow-lg">
-
-            <div className="flex items-center gap-4">
-
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-3xl">
-                🎯
-              </div>
-
-              <div>
-
-                <h2 className="text-xl font-bold text-gray-900">
-                  Entrance Exams
-                </h2>
-
-                <p className="text-sm text-gray-500">
-                  Exams accepted for admission
-                </p>
-
-              </div>
-
-            </div>
-
-            <div className="mt-6 rounded-xl bg-purple-50 p-5">
-
-              <p className="font-semibold text-purple-700">
-                {college.exams}
-              </p>
-
-            </div>
-
-          </div>
-
-          <div className="rounded-3xl bg-white p-7 shadow-lg">
-
-            <div className="flex items-center gap-4">
-
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100 text-3xl">
-                💼
-              </div>
-
-              <div>
-
-                <h2 className="text-xl font-bold text-gray-900">
-                  Top Recruiters
-                </h2>
-
-                <p className="text-sm text-gray-500">
-                  Companies hiring students
-                </p>
-
-              </div>
-
-            </div>
-
-            <div className="mt-6 rounded-xl bg-green-50 p-5">
-
-              <p className="font-semibold text-green-700">
-                {college.recruiters}
-              </p>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* ================= WHY CHOOSE ================= */}
-
-      <section className="mx-auto max-w-6xl px-6 pb-16">
-
-        <div className="rounded-3xl bg-blue-600 p-8 text-white shadow-lg">
-
-          <h2 className="text-2xl font-bold">
-            Why Consider {college.name}?
-          </h2>
-
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-
-            <div className="rounded-xl bg-white/10 p-5">
-
-              <p className="text-2xl">⭐</p>
-
-              <p className="mt-2 font-semibold">
-                Good Rating
-              </p>
-
-              <p className="mt-1 text-sm text-blue-100">
-                Rated {college.rating} / 5
-              </p>
-
-            </div>
-
-            <div className="rounded-xl bg-white/10 p-5">
-
-              <p className="text-2xl">📊</p>
-
-              <p className="mt-2 font-semibold">
-                Strong Placement
-              </p>
-
-              <p className="mt-1 text-sm text-blue-100">
-                {college.placement}% placement rate
-              </p>
-
-            </div>
-
-            <div className="rounded-xl bg-white/10 p-5">
-
-              <p className="text-2xl">🎯</p>
-
-              <p className="mt-2 font-semibold">
-                Admission Options
-              </p>
-
-              <p className="mt-1 text-sm text-blue-100">
-                {college.exams}
-              </p>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* ================= REVIEWS ================= */}
-
-      <section className="mx-auto max-w-6xl px-6 pb-16">
-
-        <div className="rounded-3xl bg-white p-8 shadow-lg">
-
-          <div className="text-center">
-
-            <p className="text-sm font-semibold uppercase tracking-wider text-blue-600">
-              Student Reviews
-            </p>
-
-            <h2 className="mt-2 text-3xl font-bold text-gray-900">
-              What Students Say
-            </h2>
-
-            <p className="mt-2 text-gray-600">
-              Read reviews or share your own experience.
-            </p>
-
-          </div>
-
-          {/* ================= REVIEW SUMMARY ================= */}
-
-          <div className="mt-8 rounded-2xl bg-blue-50 p-6 text-center">
-
-            {reviews.length === 0 ? (
-              <>
-                <p className="text-5xl">⭐</p>
-
-                <h3 className="mt-3 text-xl font-bold text-gray-900">
-                  No reviews yet
-                </h3>
-
-                <p className="mt-2 text-gray-600">
-                  Be the first student to review this college.
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="text-5xl font-bold text-blue-700">
-                  ⭐ {averageReviewRating.toFixed(1)}
-                </p>
-
-                <h3 className="mt-3 text-xl font-bold text-gray-900">
-                  Average Student Rating
-                </h3>
-
-                <p className="mt-2 text-gray-600">
-                  Based on {reviews.length} review
-                  {reviews.length !== 1 ? "s" : ""}
-                </p>
-              </>
-            )}
-
-          </div>
-
-          {/* ================= WRITE REVIEW ================= */}
-
-          <div className="mt-8 rounded-2xl border border-gray-200 p-6">
-
-            <h3 className="text-2xl font-bold text-gray-900">
-              Write a Review
-            </h3>
-
-            <p className="mt-1 text-gray-500">
-              Share your experience with other students.
-            </p>
-
-            {/* STUDENT NAME */}
-
-            <div className="mt-6">
-
-              <label className="font-semibold text-gray-700">
-                👤 Your Name
-              </label>
-
-              <input
-                type="text"
-                value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
-                placeholder="Enter your name..."
-                disabled={submitting}
-                className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100"
-              />
-
-            </div>
-
-            {/* RATING */}
-
-            <div className="mt-6">
-
-              <label className="font-semibold text-gray-700">
-                ⭐ Your Rating
-              </label>
-
-              <div className="mt-3 flex gap-2">
-
-                {[1, 2, 3, 4, 5].map((star) => (
-
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => setReviewRating(star)}
-                    className={`text-4xl transition hover:scale-110 ${
-                      star <= reviewRating
-                        ? "text-yellow-400"
-                        : "text-gray-300"
-                    }`}
-                  >
-                    ★
-                  </button>
-
-                ))}
-
-              </div>
-
-              <p className="mt-2 text-sm text-gray-500">
-                You selected {reviewRating} out of 5
-              </p>
-
-            </div>
-
-            {/* REVIEW TEXT */}
-
-            <div className="mt-6">
-
-              <label className="font-semibold text-gray-700">
-                📝 Your Review
-              </label>
-
-              <textarea
-                value={reviewText}
-                onChange={(e) => setReviewText(e.target.value)}
-                placeholder="Write your experience about this college..."
-                rows={5}
-                disabled={submitting}
-                className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100"
-              />
-
-              <div className="mt-1 text-right text-sm text-gray-400">
-                {reviewText.length} characters
-              </div>
-
-            </div>
-
-            <button
-              type="button"
-              onClick={submitReview}
-              disabled={submitting}
-              className="mt-5 rounded-xl bg-blue-600 px-7 py-3 font-semibold text-white shadow-md hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400"
-            >
-              {submitting
-                ? "Submitting..."
-                : "Submit Review"}
-            </button>
-
-          </div>
-
-          {/* ================= DISPLAY REVIEWS ================= */}
-
-          {reviews.length > 0 && (
-
-            <div className="mt-10">
-
-              <div className="flex items-center justify-between">
-
-                <h3 className="text-2xl font-bold text-gray-900">
-                  Student Reviews
-                </h3>
-
-                <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700">
-                  {reviews.length} Review
-                  {reviews.length !== 1 ? "s" : ""}
+                <span className="rounded-full border border-blue-200/10 bg-[#0d1d33] px-3 py-1 text-xs text-blue-100/55">
+                  {college.type}
                 </span>
 
               </div>
 
-              <div className="mt-5 space-y-4">
+              <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-white md:text-6xl">
+                {college.name}
+              </h1>
 
-                {reviews.map((review, index) => (
+              <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3 text-sm text-blue-100/55">
 
-                  <div
-                    key={review.id}
-                    className="rounded-2xl border border-gray-200 bg-gray-50 p-6"
-                  >
+                <span>📍 {college.location}</span>
 
-                    <div className="flex items-start justify-between gap-4">
+                <span>📚 {college.course}</span>
 
-                      <div>
+              </div>
 
-                        {/* STUDENT NAME */}
+            </div>
 
-                        <p className="text-lg font-bold text-gray-900">
-                          👤 {review.studentName || "Anonymous Student"}
-                        </p>
+            <div className="rounded-2xl border border-blue-400/15 bg-[#0d1d33] p-6 shadow-[0_15px_50px_rgba(0,0,0,0.2)] lg:min-w-[190px]">
 
-                        {/* REVIEW NUMBER + DATE */}
+              <p className="text-xs uppercase tracking-widest text-blue-200/40">
+                College Rating
+              </p>
 
-                        <p className="mt-1 text-sm text-gray-500">
-                          Student Review #{index + 1} • Posted on{" "}
-                          {new Date(review.createdAt).toLocaleDateString(
-                            "en-IN",
-                            {
+              <div className="mt-3 flex items-end gap-2">
+
+                <span className="text-4xl font-semibold text-white">
+                  {college.rating}
+                </span>
+
+                <span className="pb-1 text-sm text-blue-100/40">
+                  / 5
+                </span>
+
+              </div>
+
+              <div className="mt-2 text-sm text-blue-200/70">
+                ⭐ Excellent rating
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* ================= OVERVIEW ================= */}
+
+        <section className="py-12">
+
+          <div className="mb-7">
+
+            <p className="text-xs uppercase tracking-[0.2em] text-blue-300/50">
+              Overview
+            </p>
+
+            <h2 className="mt-2 text-2xl font-semibold">
+              College at a glance
+            </h2>
+
+          </div>
+
+          <div className="grid gap-px overflow-hidden rounded-2xl border border-blue-200/10 bg-blue-200/10 sm:grid-cols-2 lg:grid-cols-3">
+
+            {[
+              ["Course", college.course, "Available program"],
+              ["Annual Fees", formattedFees, "Estimated yearly fee"],
+              ["Placement", `${college.placement}%`, "Placement rate"],
+              ["Hostel", college.hostel, "Hostel availability"],
+              ["College Type", college.type, "Institution category"],
+              ["Location", college.location, "Campus location"],
+            ].map(([label, value, description]) => (
+
+              <div
+                key={label}
+                className="bg-[#0b192c] p-6 transition hover:bg-[#10233d]"
+              >
+
+                <p className="text-xs uppercase tracking-widest text-blue-200/40">
+                  {label}
+                </p>
+
+                <p className="mt-3 text-lg font-medium text-white">
+                  {value}
+                </p>
+
+                <p className="mt-2 text-sm text-blue-100/40">
+                  {description}
+                </p>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </section>
+
+        {/* ================= ADMISSION + RECRUITERS ================= */}
+
+        <section className="pb-12">
+
+          <div className="grid gap-5 lg:grid-cols-2">
+
+            <div className="rounded-2xl border border-blue-200/10 bg-[#0d1d33] p-7 transition hover:border-blue-400/25">
+
+              <p className="text-xs uppercase tracking-[0.2em] text-blue-300/50">
+                Admissions
+              </p>
+
+              <h2 className="mt-3 text-xl font-semibold">
+                Entrance Exams
+              </h2>
+
+              <p className="mt-2 text-sm text-blue-100/45">
+                Exams accepted for admission
+              </p>
+
+              <div className="mt-7 rounded-xl border border-blue-200/10 bg-[#0b192c] p-5">
+
+                <p className="text-sm leading-6 text-blue-50/80">
+                  {college.exams}
+                </p>
+
+              </div>
+
+            </div>
+
+            <div className="rounded-2xl border border-blue-200/10 bg-[#0d1d33] p-7 transition hover:border-blue-400/25">
+
+              <p className="text-xs uppercase tracking-[0.2em] text-blue-300/50">
+                Career
+              </p>
+
+              <h2 className="mt-3 text-xl font-semibold">
+                Top Recruiters
+              </h2>
+
+              <p className="mt-2 text-sm text-blue-100/45">
+                Companies hiring students
+              </p>
+
+              <div className="mt-7 rounded-xl border border-blue-200/10 bg-[#0b192c] p-5">
+
+                <p className="text-sm leading-6 text-blue-50/80">
+                  {college.recruiters}
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* ================= HIGHLIGHTS ================= */}
+
+        <section className="pb-12">
+
+          <div className="rounded-2xl border border-blue-400/15 bg-gradient-to-br from-[#142b49] to-[#0d1d33] p-8 shadow-[0_20px_70px_rgba(37,99,235,0.08)]">
+
+            <p className="text-xs uppercase tracking-[0.2em] text-blue-300/50">
+              Highlights
+            </p>
+
+            <h2 className="mt-3 text-2xl font-semibold">
+              Why consider {college.name}?
+            </h2>
+
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+
+              {[
+                [
+                  "⭐",
+                  "Strong Rating",
+                  `Rated ${college.rating} out of 5 by the platform.`,
+                ],
+                [
+                  "📈",
+                  "Placement Focus",
+                  `${college.placement}% reported placement rate.`,
+                ],
+                [
+                  "🎯",
+                  "Admission Route",
+                  `Admission through ${college.exams}.`,
+                ],
+              ].map(([icon, title, description]) => (
+
+                <div
+                  key={title}
+                  className="rounded-xl border border-blue-200/10 bg-[#0b192c]/80 p-5 transition hover:-translate-y-1 hover:border-blue-400/25"
+                >
+
+                  <div className="text-xl">{icon}</div>
+
+                  <h3 className="mt-4 font-medium">
+                    {title}
+                  </h3>
+
+                  <p className="mt-2 text-sm leading-6 text-blue-100/45">
+                    {description}
+                  </p>
+
+                </div>
+
+              ))}
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* ================= REVIEWS ================= */}
+
+        <section className="pb-16">
+
+          <div className="border-t border-blue-200/10 pt-12">
+
+            <div className="max-w-2xl">
+
+              <p className="text-xs uppercase tracking-[0.2em] text-blue-300/50">
+                Community
+              </p>
+
+              <h2 className="mt-3 text-3xl font-semibold">
+                Student Reviews
+              </h2>
+
+              <p className="mt-3 text-sm leading-6 text-blue-100/45">
+                Read experiences from students or share your own
+                experience with this college.
+              </p>
+
+            </div>
+
+            {/* REVIEW SUMMARY */}
+
+            <div className="mt-8 rounded-2xl border border-blue-200/10 bg-[#0d1d33] p-7">
+
+              {reviews.length === 0 ? (
+                <div>
+
+                  <div className="text-3xl">⭐</div>
+
+                  <h3 className="mt-4 text-lg font-medium">
+                    No reviews yet
+                  </h3>
+
+                  <p className="mt-2 text-sm text-blue-100/45">
+                    Be the first student to review this college.
+                  </p>
+
+                </div>
+              ) : (
+                <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+
+                  <div>
+
+                    <p className="text-xs uppercase tracking-widest text-blue-200/40">
+                      Average Rating
+                    </p>
+
+                    <p className="mt-2 text-4xl font-semibold">
+                      {averageReviewRating.toFixed(1)}
+                      <span className="ml-2 text-base text-blue-100/35">
+                        / 5
+                      </span>
+                    </p>
+
+                  </div>
+
+                  <div className="text-left sm:text-right">
+
+                    <p className="text-sm text-blue-100/60">
+                      ⭐ {reviews.length} student review
+                      {reviews.length !== 1 ? "s" : ""}
+                    </p>
+
+                    <p className="mt-1 text-xs text-blue-100/35">
+                      Based on community feedback
+                    </p>
+
+                  </div>
+
+                </div>
+              )}
+
+            </div>
+
+            {/* WRITE REVIEW */}
+
+            <div className="mt-6 rounded-2xl border border-blue-200/10 bg-[#0d1d33] p-7">
+
+              <h3 className="text-xl font-semibold">
+                Write a Review
+              </h3>
+
+              <p className="mt-2 text-sm text-blue-100/45">
+                Share your experience with other students.
+              </p>
+
+              {/* NAME */}
+
+              <div className="mt-7">
+
+                <label className="text-sm font-medium text-blue-50/80">
+                  Your Name
+                </label>
+
+                <input
+                  type="text"
+                  value={studentName}
+                  onChange={(e) => setStudentName(e.target.value)}
+                  placeholder="Enter your name..."
+                  disabled={submitting}
+                  className="mt-2 w-full rounded-xl border border-blue-200/10 bg-[#071426] px-4 py-3 text-sm text-white outline-none placeholder:text-blue-100/25 focus:border-blue-400/40 focus:ring-2 focus:ring-blue-500/10 disabled:opacity-50"
+                />
+
+              </div>
+
+              {/* RATING */}
+
+              <div className="mt-6">
+
+                <label className="text-sm font-medium text-blue-50/80">
+                  Your Rating
+                </label>
+
+                <div className="mt-3 flex gap-1">
+
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setReviewRating(star)}
+                      className={`text-3xl transition hover:scale-110 ${
+                        star <= reviewRating
+                          ? "text-blue-300"
+                          : "text-blue-100/15"
+                      }`}
+                    >
+                      ★
+                    </button>
+                  ))}
+
+                </div>
+
+                <p className="mt-2 text-xs text-blue-100/35">
+                  {reviewRating} out of 5
+                </p>
+
+              </div>
+
+              {/* COMMENT */}
+
+              <div className="mt-6">
+
+                <label className="text-sm font-medium text-blue-50/80">
+                  Your Review
+                </label>
+
+                <textarea
+                  value={reviewText}
+                  onChange={(e) => setReviewText(e.target.value)}
+                  placeholder="Write your experience about this college..."
+                  rows={5}
+                  disabled={submitting}
+                  className="mt-2 w-full resize-none rounded-xl border border-blue-200/10 bg-[#071426] px-4 py-3 text-sm leading-6 text-white outline-none placeholder:text-blue-100/25 focus:border-blue-400/40 focus:ring-2 focus:ring-blue-500/10 disabled:opacity-50"
+                />
+
+                <div className="mt-2 text-right text-xs text-blue-100/25">
+                  {reviewText.length} characters
+                </div>
+
+              </div>
+
+              <button
+                type="button"
+                onClick={submitReview}
+                disabled={submitting}
+                className="mt-5 rounded-xl bg-blue-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-400 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {submitting ? "Submitting..." : "Submit Review"}
+              </button>
+
+            </div>
+
+            {/* REVIEW LIST */}
+
+            {reviews.length > 0 && (
+
+              <div className="mt-8">
+
+                <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+
+                  <h3 className="text-xl font-semibold">
+                    Recent Reviews
+                  </h3>
+
+                  <span className="rounded-full border border-blue-200/10 bg-[#0d1d33] px-3 py-1 text-xs text-blue-100/50">
+                    {reviews.length} review
+                    {reviews.length !== 1 ? "s" : ""}
+                  </span>
+
+                </div>
+
+                <div className="space-y-4">
+
+                  {reviews.map((review, index) => (
+
+                    <div
+                      key={review.id}
+                      className="rounded-2xl border border-blue-200/10 bg-[#0d1d33] p-6 transition hover:border-blue-400/25 hover:bg-[#10233d]"
+                    >
+
+                      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+
+                        <div className="min-w-0">
+
+                          <div className="flex flex-wrap items-center gap-3">
+
+                            <p className="font-medium">
+                              {review.studentName ||
+                                "Anonymous Student"}
+                            </p>
+
+                            <span className="text-xs text-blue-100/25">
+                              Review #{index + 1}
+                            </span>
+
+                          </div>
+
+                          <p className="mt-2 text-xs text-blue-100/35">
+                            Posted{" "}
+                            {new Date(
+                              review.createdAt
+                            ).toLocaleDateString("en-IN", {
                               day: "numeric",
                               month: "long",
                               year: "numeric",
-                            }
+                            })}
+                          </p>
+
+                          {editingReviewId !== review.id && (
+
+                            <div className="mt-4 text-lg tracking-wide">
+
+                              <span className="text-blue-300">
+                                {"★".repeat(review.rating)}
+                              </span>
+
+                              <span className="text-blue-100/15">
+                                {"★".repeat(5 - review.rating)}
+                              </span>
+
+                            </div>
+
                           )}
-                        </p>
+
+                        </div>
 
                         {editingReviewId !== review.id && (
 
-                          <p className="mt-2 text-xl">
+                          <div className="flex gap-2">
 
-                            <span className="text-yellow-400">
-                              {"★".repeat(review.rating)}
-                            </span>
+                            <button
+                              type="button"
+                              onClick={() => startEditReview(review)}
+                              className="rounded-lg border border-blue-200/10 bg-[#142b49] px-3 py-2 text-xs font-medium text-blue-100/70 transition hover:border-blue-400/30 hover:bg-blue-500/10 hover:text-white"
+                            >
+                              Edit
+                            </button>
 
-                            <span className="text-gray-300">
-                              {"★".repeat(5 - review.rating)}
-                            </span>
+                            <button
+                              type="button"
+                              onClick={() => deleteReview(review.id)}
+                              className="rounded-lg border border-blue-200/10 bg-[#142b49] px-3 py-2 text-xs font-medium text-blue-100/50 transition hover:border-red-400/20 hover:bg-red-500/10 hover:text-white"
+                            >
+                              Delete
+                            </button>
 
-                          </p>
+                          </div>
 
                         )}
 
                       </div>
 
-                      {/* NORMAL BUTTONS */}
+                      {/* EDIT MODE */}
 
-                      {editingReviewId !== review.id && (
+                      {editingReviewId === review.id ? (
 
-                        <div className="flex gap-2">
+                        <div className="mt-6 border-t border-blue-200/10 pt-6">
 
-                          <button
-                            type="button"
-                            onClick={() => startEditReview(review)}
-                            className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-600"
-                          >
-                            ✏️ Edit
-                          </button>
+                          <label className="text-sm font-medium text-blue-50/80">
+                            Change Rating
+                          </label>
 
-                          <button
-                            type="button"
-                            onClick={() => deleteReview(review.id)}
-                            className="rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white hover:bg-red-600"
-                          >
-                            🗑️ Delete
-                          </button>
+                          <div className="mt-3 flex gap-1">
+
+                            {[1, 2, 3, 4, 5].map((star) => (
+
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => setEditRating(star)}
+                                className={`text-3xl transition hover:scale-110 ${
+                                  star <= editRating
+                                    ? "text-blue-300"
+                                    : "text-blue-100/15"
+                                }`}
+                              >
+                                ★
+                              </button>
+
+                            ))}
+
+                          </div>
+
+                          <p className="mt-2 text-xs text-blue-100/35">
+                            {editRating} out of 5
+                          </p>
+
+                          <label className="mt-6 block text-sm font-medium text-blue-50/80">
+                            Change Review
+                          </label>
+
+                          <textarea
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            rows={5}
+                            disabled={updating}
+                            className="mt-2 w-full resize-none rounded-xl border border-blue-200/10 bg-[#071426] px-4 py-3 text-sm leading-6 text-white outline-none focus:border-blue-400/40 focus:ring-2 focus:ring-blue-500/10 disabled:opacity-50"
+                          />
+
+                          <div className="mt-5 flex flex-wrap gap-3">
+
+                            <button
+                              type="button"
+                              onClick={() => updateReview(review.id)}
+                              disabled={updating}
+                              className="rounded-xl bg-blue-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-400 disabled:opacity-40"
+                            >
+                              {updating
+                                ? "Updating..."
+                                : "Update Review"}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={cancelEditReview}
+                              disabled={updating}
+                              className="rounded-xl border border-blue-200/10 bg-[#142b49] px-5 py-3 text-sm font-medium text-blue-100/70 transition hover:bg-[#19385d] disabled:opacity-40"
+                            >
+                              Cancel
+                            </button>
+
+                          </div>
 
                         </div>
+
+                      ) : (
+
+                        <p className="mt-5 max-w-4xl text-sm leading-7 text-blue-100/60">
+                          {review.comment}
+                        </p>
 
                       )}
 
                     </div>
 
-                    {/* ================= EDIT MODE ================= */}
+                  ))}
 
-                    {editingReviewId === review.id ? (
-
-                      <div className="mt-5">
-
-                        <label className="font-semibold text-gray-700">
-                          ⭐ Change Rating
-                        </label>
-
-                        <div className="mt-3 flex gap-2">
-
-                          {[1, 2, 3, 4, 5].map((star) => (
-
-                            <button
-                              key={star}
-                              type="button"
-                              onClick={() => setEditRating(star)}
-                              className={`text-4xl transition hover:scale-110 ${
-                                star <= editRating
-                                  ? "text-yellow-400"
-                                  : "text-gray-300"
-                              }`}
-                            >
-                              ★
-                            </button>
-
-                          ))}
-
-                        </div>
-
-                        <p className="mt-2 text-sm text-gray-500">
-                          Selected rating: {editRating} out of 5
-                        </p>
-
-                        <label className="mt-6 block font-semibold text-gray-700">
-                          📝 Change Review
-                        </label>
-
-                        <textarea
-                          value={editText}
-                          onChange={(e) =>
-                            setEditText(e.target.value)
-                          }
-                          rows={5}
-                          disabled={updating}
-                          className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100"
-                        />
-
-                        <div className="mt-5 flex flex-wrap gap-3">
-
-                          <button
-                            type="button"
-                            onClick={() => updateReview(review.id)}
-                            disabled={updating}
-                            className="rounded-xl bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700 disabled:bg-gray-400"
-                          >
-                            {updating
-                              ? "Updating..."
-                              : "💾 Update Review"}
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={cancelEditReview}
-                            disabled={updating}
-                            className="rounded-xl bg-gray-500 px-6 py-3 font-semibold text-white hover:bg-gray-600"
-                          >
-                            Cancel
-                          </button>
-
-                        </div>
-
-                      </div>
-
-                    ) : (
-
-                      <p className="mt-4 leading-relaxed text-gray-700">
-                        {review.comment}
-                      </p>
-
-                    )}
-
-                  </div>
-
-                ))}
+                </div>
 
               </div>
 
-            </div>
+            )}
 
-          )}
+          </div>
 
-        </div>
+        </section>
 
-      </section>
+      </div>
 
       {/* ================= FOOTER ================= */}
 
-      <footer className="border-t bg-white px-6 py-8 text-center">
+      <footer className="border-t border-blue-200/10 bg-[#061222] px-5 py-10 md:px-8">
 
-        <h3 className="text-xl font-bold text-blue-700">
-          CollegeFinder
-        </h3>
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 text-center md:flex-row md:items-center md:justify-between md:text-left">
 
-        <p className="mt-2 text-gray-500">
-          Find. Compare. Choose your future.
-        </p>
+          <div>
 
-        <p className="mt-4 text-sm text-gray-400">
-          © 2026 CollegeFinder. All rights reserved.
-        </p>
+            <p className="font-semibold">
+              College<span className="text-blue-300">
+                Finder
+              </span>
+            </p>
+
+            <p className="mt-1 text-xs text-blue-100/30">
+              Find. Compare. Choose your future.
+            </p>
+
+          </div>
+
+          <p className="text-xs text-blue-100/25">
+            © 2026 CollegeFinder. All rights reserved.
+          </p>
+
+        </div>
 
       </footer>
 
